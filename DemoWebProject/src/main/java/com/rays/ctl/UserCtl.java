@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.rays.bean.UserBean;
 import com.rays.model.UserModel;
 
-@WebServlet("/UserCtl")
+@WebServlet("/UserCtl.do")
 public class UserCtl extends HttpServlet {
 
 	@Override
@@ -44,6 +44,7 @@ public class UserCtl extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		String op = request.getParameter("operation");
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 		UserBean bean = new UserBean();
@@ -56,11 +57,23 @@ public class UserCtl extends HttpServlet {
 			bean.setPassword(request.getParameter("passwrod"));
 			bean.setDob(sdf.parse(request.getParameter("dob")));
 
-			try {
-				model.add(bean);
-				request.setAttribute("successMsg", "user saved successfull");
-			} catch (RuntimeException e) {
-				request.setAttribute("errorMsg", e.getMessage());
+			if (op.equals("save")) {
+				try {
+					model.add(bean);
+					request.setAttribute("bean", bean);
+					request.setAttribute("successMsg", "user saved successfull");
+				} catch (RuntimeException e) {
+					request.setAttribute("errorMsg", e.getMessage());
+				}
+			} else if (op.equals("update")) {
+				try {
+					bean.setId(Integer.parseInt(request.getParameter("id")));
+					model.update(bean);
+					request.setAttribute("bean", bean);
+					request.setAttribute("successMsg", "user update successfull");
+				} catch (RuntimeException e) {
+					request.setAttribute("errorMsg", e.getMessage());
+				}
 			}
 
 		} catch (ParseException e) {
